@@ -10,6 +10,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\tahunAjaranController;
 use App\Http\Controllers\UbahProfileController;
@@ -67,8 +68,12 @@ Route::resource('/mapel', MapelController::class)->except('show')->middleware('a
 Route::resource('/jenis_ujian', JenisUjianController::class)->except('show')->middleware('auth');
 
 // Kelas
-Route::resource('/kelas', KelasController::class)->parameters(['kelas' => 'kelas'])->except('show')->middleware('auth');
-
+Route::resource('/transaksi', TransaksiController::class)->except('show')->middleware('auth');
+// Route::get('/get-option-details/{option}/{hasBarang}', [TransaksiController::class, 'getOptionDetails'])->name('getOptionDetails');
+Route::controller(TransaksiController::class)->group(function () {
+    // export
+    Route::get('/get-option-details/{option}/{hasBarang}', 'getOptionDetails')->name('getOptionDetails')->middleware('auth');
+});
 // Tahun Ajaran
 Route::resource('/tahun_ajaran', tahunAjaranController::class)->except('show')->middleware('auth');
 

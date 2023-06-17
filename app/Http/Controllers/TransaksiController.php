@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\barang;
+use App\Models\customer;
 use App\Models\guru;
 use App\Models\kelas;
+use App\Models\sales;
+use App\Models\sales_det;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class KelasController extends Controller
+class TransaksiController extends Controller
 {
 
     /**
@@ -19,7 +23,7 @@ class KelasController extends Controller
     public function index()
     {
         if (Auth::user()->jabatan == 'admin') {
-            return view('admin.kelas.index');
+            return view('admin.transaksi.index');
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
     }
@@ -32,8 +36,9 @@ class KelasController extends Controller
     public function create()
     {
         if (Auth::user()->jabatan == 'admin') {
-            return view('admin.kelas.create', [
-                'getWaliKelas' => guru::get()
+            return view('admin.transaksi.create', [
+                'hasBarang' => barang::get(),
+                'hasCust' => customer::get()
             ]);
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
@@ -45,18 +50,17 @@ class KelasController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, kelas $kelas)
+    public function store(Request $request, sales_det $sales_det)
     {
+        // $selectedOptions = $request->input('selectedOptions');
+        dd(json_encode($request->total));
         if (Auth::user()->jabatan == 'admin') {
-            $guru = guru::where('nip', $request->nip)->first();
             $validate = $request->validate([
                 'nama_kelas' => 'required',
                 'kapasitas' => 'required',
                 'nip' => 'required|unique:kelas,nip',
-            ], [
-                'nip.unique' => 'Bapak/Ibu ' . $guru->nama_guru . ' sudah menjadi wali kelas lain.'
             ]);
-            $kelas->create($validate);
+            $sales_det->create($validate);
 
             return redirect('/kelas')->with('success', 'New Data has been added!')->withInput();
         }
@@ -136,5 +140,25 @@ class KelasController extends Controller
             return redirect()->back()->with('success', 'Data has been deleted!');
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
+    }
+
+    public function getOptionDetails($option, $hasBarang)
+    {
+        $barang = barang::where('kode', $option)->first();
+
+        // Jika data barang ditemukan, kembalikan data dalam format JSON
+        if ($barang) {
+            return response()->json([
+                'kode' => $barang->kode,
+                'nama' => $barang->nama,
+                'harga' => $barang->harga,
+                // Tambahkan kolom data lainnya yang ingin Anda tampilkan
+            ]);
+        }
+
+        // Jika data barang tidak ditemukan, kembalikan respon kosong atau pesan kesalahan
+        return response()->json([
+            'error' => 'Data barang tidak ditemukan.',
+        ], 404);
     }
 }

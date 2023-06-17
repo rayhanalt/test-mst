@@ -1,7 +1,7 @@
 <div>
     <div class="fixed top-[72px] bottom-2 right-2 left-2 flex flex-grow justify-between">
         <div>
-            <a href="/kelas/create" class="btn-success btn-outline btn btn-sm mr-2">➕ Data</a>
+            <a href="/transaksi/create" class="btn-outline btn btn-success btn-sm mr-2">➕ Data</a>
         </div>
         <div>
             @include('layout.notif')
@@ -16,10 +16,14 @@
         <thead class="sticky top-0">
             <tr>
                 <th></th>
-                <th>Kode Kelas</th>
-                <th>Nama Kelas</th>
-                <th>Kapasitas</th>
-                <th>Wali Kelas</th>
+                <th>Kode Transaksi</th>
+                <th>Tanggal</th>
+                <th>Nama Customer</th>
+                <th>Jumlah Barang</th>
+                <th>Sub Total</th>
+                <th>Diskon</th>
+                <th>Ongkir</th>
+                <th>Total</th>
 
                 <th>Action</th>
             </tr>
@@ -28,20 +32,24 @@
             @foreach ($data as $item)
                 <tr>
                     <th>{{ $loop->iteration + $data->FirstItem() - 1 }}</th>
-                    <td>{{ $item->kode_kelas }}</td>
-                    <td>{{ $item->nama_kelas }}</td>
-                    <td>{{ $item->kapasitas }}</td>
-                    <td>{{ $item->getWaliKelas->nama_guru }}</td>
+                    <td>{{ $item->kode }}</td>
+                    <td>{{ $item->hasCust->nama }}</td>
+                    <td>{{ $item->tgl }}</td>
+                    <td>{{ $item->getSalesDet->qty }}</td>
+                    <td>{{ $item->subtotal }}</td>
+                    <td>{{ $item->diskon }}</td>
+                    <td>{{ $item->ongkir }}</td>
+                    <td>{{ $item->getSalesDet->total }}</td>
 
                     <td>
-                        <a href="/kelas/{{ $item->kode_kelas }}/edit" class="btn-accent btn-outline btn btn-sm mb-1">
+                        <a href="/transaksi/{{ $item->kode }}/edit" class="btn-outline btn btn-accent btn-sm mb-1">
                             ✎
                         </a>
-                        <form action="/kelas/{{ $item->kode_kelas }}" method="POST">
+                        <form action="/transaksi/{{ $item->kode }}" method="POST">
                             @method('delete')
                             @csrf
-                            <button class="btn-outline btn-error btn btn-sm"
-                                onclick="return confirm('yakin hapus data {{ $item->nama_kelas }} ?')">
+                            <button class="btn-outline btn btn-error btn-sm"
+                                onclick="return confirm('yakin hapus data {{ $item->kode }} ?')">
                                 🗑
                             </button>
                         </form>

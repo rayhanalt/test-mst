@@ -14,13 +14,13 @@ class sales_det extends Model
 
     // ? untuk relasi
 
-    // hasMany
+    // has
     public function hasBarang()
     {
         return $this->hasMany(barang::class, 'kode', 'kode_barang');
     }
     public function hasSales()
     {
-        return $this->hasMany(sales::class, 'kode', 'kode_sales');
+        return $this->belongsTo(sales::class, 'kode', 'kode_sales');
     }
 }
