@@ -2,10 +2,10 @@
 @section('content')
     <div class="overflow-x-auto">
         <div class="card shadow-xl">
-            <h3 class="sticky top-0 text-lg font-bold">Tambah Data
+            <h3 class="top-0 z-10 bg-transparent text-lg font-bold lg:sticky">Tambah Data
                 <hr>
             </h3>
-            <div class="card-body">
+            <div class="card-body p-2 pb-10 lg:pb-0">
                 <form action="/barang" method="post" enctype="multipart/form-data">
                     @csrf
 
@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="card-actions justify-end">
-                        <button type="submit" class="btn btn-error">Reset</button>
+                        <button type="submit" class="btn-error btn">Reset</button>
                         <button type="submit"class="btn btn-success">Simpan</button>
                     </div>
                 </form>

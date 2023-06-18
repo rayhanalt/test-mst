@@ -53,7 +53,7 @@ class TransaksiController extends Controller
     public function store(Request $request, sales_det $sales_det)
     {
         // $selectedOptions = $request->input('selectedOptions');
-        dd(json_encode($request->total));
+        dd(json_encode($request->total_bayar));
         if (Auth::user()->jabatan == 'admin') {
             $validate = $request->validate([
                 'nama_kelas' => 'required',

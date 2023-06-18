@@ -1,25 +1,25 @@
 @extends('app')
 @section('content')
+    <h3 class="top-0 z-10 bg-transparent text-lg font-bold lg:sticky">Tambah Data
+        <hr>
+    </h3>
     <div class="overflow-x-auto">
         <div class="card shadow-xl">
-            <h3 class="sticky top-0 text-lg font-bold">Tambah Data
-                <hr>
-            </h3>
             <div class="card-body">
-                <form action="/tahun_ajaran" method="post" enctype="multipart/form-data">
+                <form action="/customer" method="post" enctype="multipart/form-data">
                     @csrf
 
                     <div class="form-control w-full max-w-full">
                         <label class="label">
-                            <span class="label-text">Kode Tahun Ajaran</span>
+                            <span class="label-text">Nama</span>
                             <span class="label-text-alt"></span>
                         </label>
-                        <input name="kode_tahun_ajaran" type="text" placeholder="Type here"
-                            value="{{ old('kode_tahun_ajaran') }}" class="input-bordered input w-full max-w-full" />
+                        <input name="nama" type="text" placeholder="Type here" value="{{ old('nama') }}"
+                            class="input-bordered input w-full max-w-full" />
                         <label class="label">
                             <span class="label-text-alt"></span>
                             <span class="label-text-alt text-red-600">
-                                @error('kode_tahun_ajaran')
+                                @error('nama')
                                     {{ $message }}
                                 @enderror
                             </span>
@@ -27,15 +27,15 @@
                     </div>
                     <div class="form-control w-full max-w-full">
                         <label class="label">
-                            <span class="label-text">Tahun Ajaran</span>
+                            <span class="label-text">Telp</span>
                             <span class="label-text-alt"></span>
                         </label>
-                        <input name="tahun_ajaran" type="text" placeholder="Type here" value="{{ old('tahun_ajaran') }}"
+                        <input name="telp" type="tel" placeholder="Type here" value="{{ old('telp') }}"
                             class="input-bordered input w-full max-w-full" />
                         <label class="label">
                             <span class="label-text-alt"></span>
                             <span class="label-text-alt text-red-600">
-                                @error('tahun_ajaran')
+                                @error('telp')
                                     {{ $message }}
                                 @enderror
                             </span>

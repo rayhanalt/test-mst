@@ -1,15 +1,21 @@
 @extends('app')
 @section('content')
+    <style>
+        .right-align {
+            text-align: right;
+        }
+    </style>
+
+    <h3 class="top-0 z-50 bg-transparent text-lg font-bold lg:sticky">Tambah Data
+        <hr>
+    </h3>
     <div class="overflow-x-auto">
         <div class="card shadow-xl">
-            <h3 class="sticky top-0 text-lg font-bold">Tambah Data
-                <hr>
-            </h3>
-            <div class="card-body">
+            <div class="card-body p-2 pb-10 lg:pb-0">
                 <form action="/transaksi" method="post" id="myForm" enctype="multipart/form-data">
                     @csrf
 
-                    <div class="form-control w-2/12">
+                    <div class="form-control sm:w-2/6">
                         <label class="label">
                             <span class="label-text">Tanggal Transaksi</span>
                             <span class="label-text-alt"></span>
@@ -36,7 +42,7 @@
                             @foreach ($hasCust as $customer)
                                 <option value="{{ $customer->kode }}"
                                     {{ old('kode') == $customer->kode ? 'selected' : '' }}>
-                                    {{ $customer->nama }} | {{ $customer->kode }}</option>
+                                    {{ $customer->nama }} | {{ $customer->telp }}</option>
                             @endforeach
                         </select>
                         <label class="label">
@@ -73,26 +79,53 @@
                             </span>
                         </label>
                     </div>
-
-                    <table id="resultTable" class="table-compact table w-full">
-                        <thead class="table-header-group">
-                            <th colspan="4" class="text-center">Hasil Select</th>
-                        </thead>
-                        <tbody id="resultTableBody">
-                            <!-- Tempatkan hasil select di sini -->
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table id="resultTable" class="table-compact table w-full">
+                            <thead class="table-header-group">
+                                <tr class="text-center">
+                                    <th rowspan="2"></th>
+                                    <th rowspan="2">kode</th>
+                                    <th rowspan="2">Nama</th>
+                                    <th rowspan="2">Harga</th>
+                                    <th rowspan="2">Qty</th>
+                                    <th colspan="2">Diskon</th>
+                                    <th rowspan="2">Harga Diskon</th>
+                                    <th rowspan="2">Subtotal</th>
+                                    <th rowspan="2">Aksi</th>
+                                </tr>
+                                <tr class="text-center">
+                                    <th>(%)</th>
+                                    <th>Rp.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTableBody" class="border-2">
+                                <!-- Tempatkan hasil select di sini -->
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="mt-5">
-                        Total Harga : <span id="totalHarga"></span>
+                        <div>
+                            Total Harga: <span id="totalHarga"></span>
+                        </div>
+                        <div>
+                            Diskon: <input type="number" id="diskonUser" name="diskon_user" onchange="totalBayar()">
+                        </div>
+                        <div>
+                            Ongkir: <input type="number" id="ongkirUser" name="ongkir_user" onchange="totalBayar()">
+                        </div>
+                        <div>
+                            Total yang Harus Dibayar: <span id="totalBayar"></span>
+                        </div>
                     </div>
 
 
                     <input type="hidden" name="kode[]" value="">
                     <input type="hidden" name="total" id="totalInput" value="">
+                    <input type="hidden" name="total_bayar" id="totalBayarInput" value="">
 
                     <div class="card-actions mt-5 justify-end">
-                        <button type="reset" class="btn btn-error">Reset</button>
+                        <button type="reset" class="btn-error btn">Reset</button>
                         <button type="submit"class="btn btn-success">Simpan</button>
                     </div>
                 </form>
@@ -118,6 +151,7 @@
                 // Loop melalui setiap opsi terpilih
                 for (let i = 0; i < selectedOptions.length; i++) {
                     const optionValue = selectedOptions[i];
+                    const iterationNumber = i + 1; // Nomor iterasi
 
                     // Lakukan permintaan AJAX untuk mendapatkan data lengkap opsi terpilih
                     fetch('{{ url('get-option-details') }}/' + optionValue + '/{{ $hasBarang }}')
@@ -125,6 +159,10 @@
                         .then(data => {
                             // Buat baris dan sel baru untuk setiap opsi terpilih
                             const newRow = document.createElement('tr');
+
+                            // Sel untuk menampilkan nilai opsi
+                            const noCell = document.createElement('td');
+                            noCell.textContent = iterationNumber;
 
                             // Sel untuk menampilkan nilai opsi
                             const kodeCell = document.createElement('td');
@@ -137,6 +175,59 @@
                             // Sel untuk menampilkan harga
                             const priceCell = document.createElement('td');
                             priceCell.textContent = 'Rp.' + parseFloat(data.harga).toLocaleString('id-ID');
+
+                            // Kolom Qty
+                            const qtyCell = document.createElement('td');
+                            const qtyInput = document.createElement('input');
+                            qtyInput.type = 'number';
+                            qtyInput.value = 1; // Default value
+                            qtyInput.classList.add('right-align');
+                            qtyInput.name = 'qty[]';
+                            qtyInput.addEventListener('input', () => {
+                                updateSubtotal(newRow, data.harga, qtyInput.value, diskonPercentInput
+                                    .value, diskonAmountInput.value);
+                            });
+                            qtyCell.appendChild(qtyInput);
+
+                            // Kolom Diskon (%) dan (Rp)
+                            const diskonPercentCell = document.createElement('td');
+                            const diskonPercentInput = document.createElement('input');
+                            diskonPercentInput.type = 'number';
+                            diskonPercentInput.value = 0; // Default value
+                            diskonPercentInput.name = 'diskon_persen[]'; // Default value
+                            diskonPercentInput.classList.add('right-align');
+                            diskonPercentInput.addEventListener('input', () => {
+                                // Mengupdate nilai diskon dalam bentuk uang
+                                const diskonPercent = parseFloat(diskonPercentInput.value);
+                                const diskonAmount = (parseFloat(data.harga) * diskonPercent) / 100;
+                                diskonAmountInput.value = diskonAmount;
+                                updateSubtotal(newRow, data.harga, qtyInput.value, diskonPercentInput
+                                    .value, diskonAmount);
+                            });
+                            diskonPercentCell.appendChild(diskonPercentInput);
+
+                            const diskonAmountCell = document.createElement('td');
+                            const diskonAmountInput = document.createElement('input');
+                            diskonAmountInput.type = 'number';
+                            diskonAmountInput.value = 0; // Default value
+                            diskonAmountInput.name = 'diskon_amount[]'; // Default value
+                            diskonAmountInput.classList.add('right-align');
+                            diskonAmountInput.addEventListener('input', () => {
+                                // Mengupdate nilai diskon dalam persentase
+                                const diskonAmount = parseFloat(diskonAmountInput.value);
+                                const diskonPercent = (diskonAmount / parseFloat(data.harga)) * 100;
+                                diskonPercentInput.value = diskonPercent;
+                                updateSubtotal(newRow, data.harga, qtyInput.value, diskonPercent,
+                                    diskonAmountInput.value);
+                            });
+                            diskonAmountCell.appendChild(diskonAmountInput);
+
+                            const hargaDiskonCell = document.createElement('td');
+                            hargaDiskonCell.textContent = 'Rp.0';
+
+                            // Kolom Subtotal
+                            const subtotalCell = document.createElement('td');
+                            subtotalCell.textContent = 'Rp.0';
 
                             // Tambahkan harga ke total harga
                             totalHarga += parseFloat(data.harga);
@@ -157,13 +248,18 @@
                             });
 
                             deleteCell.appendChild(deleteButton);
+                            newRow.appendChild(noCell);
                             newRow.appendChild(kodeCell);
                             newRow.appendChild(valueCell);
                             newRow.appendChild(priceCell);
+                            newRow.appendChild(qtyCell);
+                            newRow.appendChild(diskonPercentCell);
+                            newRow.appendChild(diskonAmountCell);
+                            newRow.appendChild(hargaDiskonCell);
+                            newRow.appendChild(subtotalCell);
                             newRow.appendChild(deleteCell);
 
                             resultTableBody.appendChild(newRow);
-
 
                             // Perbarui total harga pada elemen HTML yang menampilkannya
                             const totalHargaElement = document.getElementById('totalHarga');
@@ -173,7 +269,6 @@
                             // Perbarui nilai input total
                             const totalInput = document.getElementById('totalInput');
                             totalInput.value = totalHarga;
-
                         })
                         .catch(error => {
                             console.error('Terjadi kesalahan:', error);
@@ -186,14 +281,50 @@
 
                 // Perbarui total harga pada elemen HTML yang menampilkannya
                 const totalHargaElement = document.getElementById('totalHarga');
-                totalHargaElement.textContent = totalHarga;
-
-
-
+                totalHargaElement.textContent = 'Rp.' + totalHarga;
 
                 // Perbarui input type hidden setiap kali tabel diperbarui
                 updateHiddenInputs();
+            }
 
+            function updateSubtotal(row, harga, qty, diskonPercent, diskonAmount) {
+                const hargaDiskonCell = row.querySelector('td:nth-child(8)');
+                const subtotalCell = row.querySelector('td:nth-child(9)');
+
+                let subtotal = parseFloat(harga) * parseInt(qty);
+
+                if (diskonPercent > 0) {
+                    const diskon = (subtotal * diskonPercent) / 100;
+                    const hargaDiskon = harga - (harga * diskonPercent) / 100;
+
+                    hargaDiskonCell.textContent = 'Rp.' + hargaDiskon.toLocaleString('id-ID');
+                    subtotal -= diskon;
+                } else if (diskonAmount > 0) {
+                    const diskon = parseFloat(diskonAmount);
+                    hargaDiskonCell.textContent = 'Rp.' + hargaDiskon.toLocaleString('id-ID');
+                    subtotal -= diskon;
+                } else {
+                    hargaDiskonCell.textContent = 'Rp.0';
+                }
+
+                subtotalCell.textContent = 'Rp.' + subtotal.toLocaleString('id-ID');
+                calculateTotalHarga();
+            }
+
+            function calculateTotalHarga() {
+                totalHarga = 0;
+                const subtotalCells = document.querySelectorAll('#resultTableBody td:nth-child(9)');
+                subtotalCells.forEach(cell => {
+                    totalHarga += parseFloat(cell.textContent.replace('Rp.', '').replace('.', '').replace(
+                        ',', ''));
+                });
+
+                const totalHargaElement = document.getElementById('totalHarga');
+                totalHargaElement.textContent = 'Rp.' + totalHarga.toLocaleString('id-ID');
+
+                // Update input hidden dengan name 'total'
+                const totalInput = document.getElementById('totalInput');
+                totalInput.value = totalHarga;
             }
 
             // Fungsi untuk memperbarui input type hidden dengan data kode terpilih
@@ -214,6 +345,7 @@
                     input.setAttribute('value', kode);
                     form.appendChild(input);
                 });
+
             }
 
             // Event listener saat select berubah
@@ -235,5 +367,25 @@
 
 
         });
+    </script>
+    <script>
+        function totalBayar() {
+            const totalHargaElement = document.getElementById('totalInput');
+            const diskonElement = document.getElementById('diskonUser');
+            const ongkirUserElement = document.getElementById('ongkirUser');
+            const totalBayarElement = document.getElementById('totalBayar');
+
+            const totalHargaValue = parseFloat(totalHargaElement.value) || 0; // Menggunakan nilai totalHarga global
+            const diskon = parseFloat(diskonElement.value) || 0;
+            const ongkir = parseFloat(ongkirUserElement.value) || 0;
+
+            const totalBayar = totalHargaValue - (diskon + ongkir);
+
+            // Update input hidden dengan name 'total'
+            const totalbayarInput = document.getElementById('totalBayarInput');
+            totalbayarInput.value = totalBayar;
+
+            totalBayarElement.textContent = 'Rp.' + totalBayar.toLocaleString('id-ID');
+        }
     </script>
 @endsection

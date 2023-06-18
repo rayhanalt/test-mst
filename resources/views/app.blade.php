@@ -28,7 +28,7 @@
                     {{-- Notif hak akses --}}
                     @if (session()->has('error'))
                         <div class="fixed bottom-14 left-0 right-0 m-auto flex h-12 w-full items-center justify-center">
-                            <button class="btn-error btn-xs btn">
+                            <button class="btn-error btn btn-xs">
                                 {{ session('error') }}
                             </button>
                         </div>
@@ -49,13 +49,14 @@
 
                 @can('admin')
                     <li><a href="/barang">Barang</a></li>
+                    <li><a href="/customer">Customer</a></li>
                     <li><a href="/transaksi">Transaksi</a></li>
                 @endcan
                 @can('user')
                     <!-- User can -->
                 @endcan
                 <hr class="my-4 rounded-3xl border-2 border-dashed border-emerald-500" />
-                <li><a href="/user/edit/{{ auth()->user()->username }}" class="btn-outline btn-secondary btn">Ubah
+                <li><a href="/user/edit/{{ auth()->user()->username }}" class="btn-outline btn btn-secondary">Ubah
                         Profil</a></li>
             </ul>
         </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\MapelController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\JenisUjianController;
@@ -55,7 +56,7 @@ Route::controller(UbahProfileController::class)->group(function () {
     Route::put('user/editSiswa/{user}', 'updateSiswa')->middleware('auth');
 });
 
-// Guru
+// Barang
 Route::resource('/barang', BarangController::class)->except('show')->middleware('auth');
 
 // Siswa
@@ -67,15 +68,14 @@ Route::resource('/mapel', MapelController::class)->except('show')->middleware('a
 // JenisUjian
 Route::resource('/jenis_ujian', JenisUjianController::class)->except('show')->middleware('auth');
 
-// Kelas
+// Transaksi
 Route::resource('/transaksi', TransaksiController::class)->except('show')->middleware('auth');
-// Route::get('/get-option-details/{option}/{hasBarang}', [TransaksiController::class, 'getOptionDetails'])->name('getOptionDetails');
 Route::controller(TransaksiController::class)->group(function () {
-    // export
+    // get detail transaksi
     Route::get('/get-option-details/{option}/{hasBarang}', 'getOptionDetails')->name('getOptionDetails')->middleware('auth');
 });
-// Tahun Ajaran
-Route::resource('/tahun_ajaran', tahunAjaranController::class)->except('show')->middleware('auth');
+// Customer
+Route::resource('/customer', CustomerController::class)->except('show')->middleware('auth');
 
 // export excel
 Route::controller(ExportController::class)->group(function () {

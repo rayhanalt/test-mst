@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\tahunAjaran;
+use App\Models\customer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-class tahunAjaranController extends Controller
+class CustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class tahunAjaranController extends Controller
     public function index()
     {
         if (Auth::user()->jabatan == 'admin') {
-            return view('admin.tahun_ajaran.index');
+            return view('admin.customer.index');
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
     }
@@ -29,7 +29,7 @@ class tahunAjaranController extends Controller
     public function create()
     {
         if (Auth::user()->jabatan == 'admin') {
-            return view('admin.tahun_ajaran.create');
+            return view('admin.customer.create');
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
     }
@@ -45,12 +45,12 @@ class tahunAjaranController extends Controller
         if (Auth::user()->jabatan == 'admin') {
 
             $validate = $request->validate([
-                'kode_tahun_ajaran' => 'required|unique:tahun_ajaran,kode_tahun_ajaran',
-                'tahun_ajaran' => 'required',
+                'nama' => 'required',
+                'telp' => 'required',
             ]);
-            tahunAjaran::create($validate);
+            customer::create($validate);
 
-            return redirect('/tahun_ajaran')->with('success', 'New Data has been added!')->withInput();
+            return redirect('/customer')->with('success', 'New Data has been added!')->withInput();
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
     }
@@ -58,10 +58,10 @@ class tahunAjaranController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\tahunAjaran  $tahunAjaran
+     * @param  \App\Models\customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function show(tahunAjaran $tahunAjaran)
+    public function show(customer $customer)
     {
         //
     }
@@ -69,14 +69,14 @@ class tahunAjaranController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\tahunAjaran  $tahunAjaran
+     * @param  \App\Models\customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function edit(tahunAjaran $tahunAjaran)
+    public function edit(customer $customer)
     {
         if (Auth::user()->jabatan == 'admin') {
-            return view('admin.tahun_ajaran.edit', [
-                'item' => $tahunAjaran
+            return view('admin.customer.edit', [
+                'item' => $customer
             ]);
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
@@ -86,20 +86,20 @@ class tahunAjaranController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\tahunAjaran  $tahunAjaran
+     * @param  \App\Models\customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, tahunAjaran $tahunAjaran)
+    public function update(Request $request, customer $customer)
     {
         if (Auth::user()->jabatan == 'admin') {
             $validate = $request->validate([
-                'kode_tahun_ajaran' => 'required|unique:tahun_ajaran,kode_tahun_ajaran',
-                'tahun_ajaran' => 'required'
+                'nama' => 'required',
+                'telp' => 'required',
             ]);
 
-            $tahunAjaran->update($validate);
+            $customer->update($validate);
 
-            return redirect('/tahun_ajaran')->with('success', 'Data has been updated!')->withInput();
+            return redirect('/customer')->with('success', 'Data has been updated!')->withInput();
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
     }
@@ -107,13 +107,13 @@ class tahunAjaranController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\tahunAjaran  $tahunAjaran
+     * @param  \App\Models\customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(tahunAjaran $tahunAjaran)
+    public function destroy(customer $customer)
     {
         if (Auth::user()->jabatan == 'admin') {
-            $tahunAjaran->delete();
+            $customer->delete();
             return redirect()->back()->with('success', 'Data has been deleted!');
         }
         return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
