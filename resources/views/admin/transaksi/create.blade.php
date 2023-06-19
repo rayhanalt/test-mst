@@ -210,7 +210,7 @@
                             const diskonAmountInput = document.createElement('input');
                             diskonAmountInput.type = 'number';
                             diskonAmountInput.value = 0; // Default value
-                            diskonAmountInput.name = 'diskon_amount[]'; // Default value
+                            diskonAmountInput.name = 'diskon_nilai[]'; // Default value
                             diskonAmountInput.classList.add('right-align');
                             diskonAmountInput.addEventListener('input', () => {
                                 // Mengupdate nilai diskon dalam persentase
@@ -287,11 +287,24 @@
                 updateHiddenInputs();
             }
 
+
             function updateSubtotal(row, harga, qty, diskonPercent, diskonAmount) {
                 const hargaDiskonCell = row.querySelector('td:nth-child(8)');
                 const subtotalCell = row.querySelector('td:nth-child(9)');
 
                 let subtotal = parseFloat(harga) * parseInt(qty);
+
+                // Hapus elemen input type hidden dengan name="harga_diskon" jika ada
+                const existingHargaDiskonInput = row.querySelector('input[name="harga_diskon[]"]');
+                const existingSubtotalInput = row.querySelector('input[name="subtotal[]"]');
+
+                if (existingHargaDiskonInput) {
+                    existingHargaDiskonInput.remove();
+                }
+
+                if (existingSubtotalInput) {
+                    existingSubtotalInput.remove();
+                }
 
                 if (diskonPercent > 0) {
                     const diskon = (subtotal * diskonPercent) / 100;
@@ -299,6 +312,22 @@
 
                     hargaDiskonCell.textContent = 'Rp.' + hargaDiskon.toLocaleString('id-ID');
                     subtotal -= diskon;
+
+                    // Buat elemen input type hidden untuk harga_diskon
+                    const hargaDiskonInput = document.createElement('input');
+                    hargaDiskonInput.setAttribute('type', 'hidden');
+                    hargaDiskonInput.setAttribute('name', 'harga_diskon[]');
+                    hargaDiskonInput.setAttribute('value', hargaDiskon);
+                    row.appendChild(hargaDiskonInput);
+
+                    // Buat elemen input type hidden untuk subtotal
+                    const subtotalInput = document.createElement('input');
+                    subtotalInput.setAttribute('type', 'hidden');
+                    subtotalInput.setAttribute('name', 'subtotal[]');
+                    subtotalInput.setAttribute('value', subtotal);
+                    row.appendChild(subtotalInput);
+
+
                 } else if (diskonAmount > 0) {
                     const diskon = parseFloat(diskonAmount);
                     hargaDiskonCell.textContent = 'Rp.' + hargaDiskon.toLocaleString('id-ID');
@@ -310,6 +339,7 @@
                 subtotalCell.textContent = 'Rp.' + subtotal.toLocaleString('id-ID');
                 calculateTotalHarga();
             }
+
 
             function calculateTotalHarga() {
                 totalHarga = 0;
@@ -347,6 +377,7 @@
                 });
 
             }
+
 
             // Event listener saat select berubah
             selectElement.addEventListener('change', () => {
