@@ -18,7 +18,7 @@
 6. jalankan perintah ```php artisan config:clear```
 7. jalankan perintah ```php artisan key:generate```
 8. jalankan perintah ```php artisan migrate```
-9. jalankan perintah ```php artisan serve```, lalu buka terminal lain untuk jalankan ```npm run dev`` (opsional)
+9. jalankan perintah ```php artisan serve```, lalu buka terminal lain untuk jalankan ```npm run dev``` (opsional)
 10. selamat mencoba.
 
 
