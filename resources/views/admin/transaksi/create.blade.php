@@ -14,18 +14,17 @@
             <div class="card-body p-2 pb-10 lg:pb-0">
                 <form action="/transaksi" method="post" id="myForm" enctype="multipart/form-data">
                     @csrf
-
                     <div class="form-control sm:w-2/6">
                         <label class="label">
                             <span class="label-text">Tanggal Transaksi</span>
                             <span class="label-text-alt"></span>
                         </label>
-                        <input name="tanggal_lahir" type="date" placeholder="Tanggal Transaksi"
-                            value="{{ old('tanggal_lahir') }}" class="datepicker input-bordered input">
+                        <input name="tgl" type="date" placeholder="Tanggal Transaksi" value="{{ old('tgl') }}"
+                            class="datepicker input-bordered input">
                         <label class="label">
                             <span class="label-text-alt"></span>
                             <span class="label-text-alt text-red-600">
-                                @error('tanggal_lahir')
+                                @error('tgl')
                                     {{ $message }}
                                 @enderror
                             </span>
@@ -40,15 +39,18 @@
                         <select class="select-bordered select" name="kode_cust">
                             <option disabled selected>Pick one</option>
                             @foreach ($hasCust as $customer)
-                                <option value="{{ $customer->kode }}"
-                                    {{ old('kode') == $customer->kode ? 'selected' : '' }}>
-                                    {{ $customer->nama }} | {{ $customer->telp }}</option>
+                                @if (!in_array($customer->kode, $kodeCustTerpakai))
+                                    <option value="{{ $customer->kode }}"
+                                        {{ old('kode_customer') == $customer->kode ? 'selected' : '' }}>
+                                        {{ $customer->kode }} | {{ $customer->nama }}
+                                    </option>
+                                @endif
                             @endforeach
                         </select>
                         <label class="label">
                             <span class="label-text-alt"></span>
                             <span class="label-text-alt text-red-600">
-                                @error('nip')
+                                @error('kode_cust')
                                     {{ $message }}
                                 @enderror
                             </span>
@@ -64,16 +66,18 @@
                             <!-- Opsi-opsi select -->
                             <option disabled selected>Pick one</option>
                             @foreach ($hasBarang as $barang)
-                                <option value="{{ $barang->kode }}" {{ old('kode') == $barang->kode ? 'selected' : '' }}>
+                                <option value="{{ $barang->kode }}"
+                                    {{ old('kode_barang') == $barang->kode ? 'selected' : '' }}>
                                     {{ $barang->nama }} | {{ 'Rp. ' . number_format($barang->harga, 0, ',', '.') }}
                                 </option>
                             @endforeach
+
                             <!-- dan seterusnya -->
                         </select>
                         <label class="label">
                             <span class="label-text-alt"></span>
                             <span class="label-text-alt text-red-600">
-                                @error('nip')
+                                @error('kode_barang')
                                     {{ $message }}
                                 @enderror
                             </span>
@@ -117,6 +121,22 @@
                         <div>
                             Total yang Harus Dibayar: <span id="totalBayar"></span>
                         </div>
+                        <div>
+                            <span class="label-text-alt text-red-600">
+                                @error('diskon_user')
+                                    {{ $message }}
+                                @enderror
+                                @error('ongkir_user')
+                                    {{ $message }}
+                                @enderror
+                                @error('diskon_persen')
+                                    {{ $message }}
+                                @enderror
+                                @error('qty')
+                                    {{ $message }}
+                                @enderror
+                            </span>
+                        </div>
                     </div>
 
 
@@ -125,7 +145,7 @@
                     <input type="hidden" name="total_bayar" id="totalBayarInput" value="">
 
                     <div class="card-actions mt-5 justify-end">
-                        <button type="reset" class="btn-error btn">Reset</button>
+                        <button type="reset" class="btn btn-error">Reset</button>
                         <button type="submit"class="btn btn-success">Simpan</button>
                     </div>
                 </form>
@@ -227,7 +247,12 @@
 
                             // Kolom Subtotal
                             const subtotalCell = document.createElement('td');
-                            subtotalCell.textContent = 'Rp.0';
+                            const subtotalHiddenInput = document.createElement('input');
+                            subtotalHiddenInput.type = 'hidden';
+                            subtotalHiddenInput.value = data.harga; // Default value
+                            subtotalHiddenInput.name = 'subtotal[]';
+                            subtotalCell.textContent = 'Rp.' + parseFloat(data.harga).toLocaleString('id-ID');
+                            subtotalCell.appendChild(subtotalHiddenInput);
 
                             // Tambahkan harga ke total harga
                             totalHarga += parseFloat(data.harga);
@@ -410,7 +435,7 @@
             const diskon = parseFloat(diskonElement.value) || 0;
             const ongkir = parseFloat(ongkirUserElement.value) || 0;
 
-            const totalBayar = totalHargaValue - (diskon + ongkir);
+            const totalBayar = totalHargaValue - diskon + ongkir;
 
             // Update input hidden dengan name 'total'
             const totalbayarInput = document.getElementById('totalBayarInput');

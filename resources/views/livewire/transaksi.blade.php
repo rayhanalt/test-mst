@@ -33,13 +33,13 @@
                 <tr>
                     <th>{{ $loop->iteration + $data->FirstItem() - 1 }}</th>
                     <td>{{ $item->kode }}</td>
+                    <td>{{ date('d F Y', strtotime($item->tgl)) }}</td>
                     <td>{{ $item->hasCust->nama }}</td>
-                    <td>{{ $item->tgl }}</td>
-                    <td>{{ $item->getSalesDet->qty }}</td>
-                    <td>{{ $item->subtotal }}</td>
-                    <td>{{ $item->diskon }}</td>
-                    <td>{{ $item->ongkir }}</td>
-                    <td>{{ $item->getSalesDet->total }}</td>
+                    <td>{{ $item->getSalesDet()->where('kode_sales', $item->kode)->sum('qty') }}</td>
+                    <td>{{ 'Rp. ' . number_format($item->subtotal, 0, ',', '.') }}</td>
+                    <td>{{ 'Rp. ' . number_format($item->diskon, 0, ',', '.') }}</td>
+                    <td>{{ 'Rp. ' . number_format($item->ongkir, 0, ',', '.') }}</td>
+                    <td>{{ 'Rp. ' . number_format($item->total_bayar, 0, ',', '.') }}</td>
 
                     <td>
                         <a href="/transaksi/{{ $item->kode }}/edit" class="btn-outline btn btn-accent btn-sm mb-1">

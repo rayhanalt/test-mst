@@ -35,13 +35,13 @@ class sales extends Model
     // HasMany
     public function hasCust()
     {
-        return $this->hasMany(customer::class, 'kode', 'kode_cust');
+        return $this->belongsTo(customer::class, 'kode_cust', 'kode');
     }
     // ? untuk relasi
 
     // BelongsTo
     public function getSalesDet()
     {
-        return $this->hasMany(sales_det::class, 'kode_sales', 'kode');
+        return $this->belongsTo(sales_det::class, 'kode', 'kode_sales');
     }
 }

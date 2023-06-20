@@ -17,10 +17,10 @@ class sales_det extends Model
     // has
     public function hasBarang()
     {
-        return $this->hasMany(barang::class, 'kode', 'kode_barang');
+        return $this->hasOne(barang::class, 'kode', 'kode_barang');
     }
     public function hasSales()
     {
-        return $this->belongsTo(sales::class, 'kode', 'kode_sales');
+        return $this->hasOne(sales::class, 'kode', 'kode_sales');
     }
 }

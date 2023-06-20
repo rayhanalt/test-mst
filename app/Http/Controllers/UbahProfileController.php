@@ -21,18 +21,7 @@ class UbahProfileController extends Controller
 
                ]);
           }
-          if (Auth::user()->jabatan == 'guru' && Auth::user()->username == $user->username) {
-               return view('user.editGuru', [
-                    'item' => $user,
-                    'guru' => guru::where('nip', $user->username)->first()
-               ]);
-          }
-          if (Auth::user()->jabatan == 'siswa' && Auth::user()->username == $user->username) {
-               return view('user.editSiswa', [
-                    'item' => $user,
-                    'siswa' => siswa::where('nis', $user->username)->first()
-               ]);
-          }
+
           return redirect()->back()->with('error', 'anda tidak memiliki hak akses');
      }
 

@@ -32,6 +32,6 @@ class customer extends Model
     //  ? untuk relasi
     public function getSales()
     {
-        return $this->belongsTo(sales::class, 'kode_cust', 'kode');
+        return $this->hasMany(sales::class, 'kode', 'kode_cust');
     }
 }
