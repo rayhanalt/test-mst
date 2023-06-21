@@ -17,9 +17,10 @@
 5. jalankan perintah ```php artisan cache:clear``` dan ```php artisan config:clear```
 6. jalankan perintah ```php artisan config:clear```
 7. jalankan perintah ```php artisan key:generate```
-8. jalankan perintah ```php artisan migrate```
+8. jalankan perintah ```php artisan migrate --seed```
 9. jalankan perintah ```php artisan serve```, lalu buka terminal lain untuk jalankan ```npm run dev``` (opsional)
-10. selamat mencoba.
+10. username : admin , password : 12345
+11. selamat mencoba.
 
 
 ## Contributing
